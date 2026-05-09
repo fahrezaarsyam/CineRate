@@ -65,13 +65,13 @@ def create_user(username, email, password):
 # Movie Queries
 def get_all_movies():
     with get_db_cursor() as cur:
-        cur.execute("SELECT id AS movie_id, title, synopsis, director, release_year FROM movies ORDER BY title")
+        cur.execute("SELECT id AS movie_id, title, synopsis, director, release_year, poster_url FROM movies ORDER BY title")
         return cur.fetchall()
 
 def get_movie_by_id(movie_id):
     with get_db_cursor() as cur:
         cur.execute("""
-            SELECT m.id AS movie_id, m.title, m.synopsis, m.director, m.release_year,
+            SELECT m.id AS movie_id, m.title, m.synopsis, m.director, m.release_year, m.poster_url,
                    COALESCE(ROUND(AVG(r.rating),1),0) AS avg_rating, COUNT(r.id) AS review_count
             FROM movies m LEFT JOIN reviews r ON m.id = r.movie_id
             WHERE m.id = %s GROUP BY m.id
@@ -81,7 +81,7 @@ def get_movie_by_id(movie_id):
 def get_top10_movies():
     with get_db_cursor() as cur:
         cur.execute("""
-            SELECT m.id AS movie_id, m.title, m.synopsis, m.director, m.release_year,
+            SELECT m.id AS movie_id, m.title, m.synopsis, m.director, m.release_year, m.poster_url,
                    COALESCE(ROUND(AVG(r.rating),1),0) AS avg_rating, COUNT(r.id) AS review_count
             FROM movies m LEFT JOIN reviews r ON m.id = r.movie_id
             GROUP BY m.id HAVING COUNT(r.id) > 0

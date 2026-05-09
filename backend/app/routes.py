@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel, Field
-from app import models, cache
+
+from app import cache, models
+
 
 class ReviewCreate(BaseModel):
     user_id: str
@@ -8,17 +10,15 @@ class ReviewCreate(BaseModel):
     rating: int = Field(..., ge=1, le=5)
     review_text: str = ""
 
-class UserCreate(BaseModel):
-    username: str = Field(..., min_length=2, max_length=50)
-    email: str
-    password: str = Field(..., min_length=6)
 
-# Movies Router
 movies_router = APIRouter(prefix="/api/movies", tags=["Movies"])
+reviews_router = APIRouter(prefix="/api/reviews", tags=["Reviews"])
+
 
 @movies_router.get("")
 def list_movies():
     return models.get_all_movies()
+
 
 @movies_router.get("/top10")
 def top10_movies():
@@ -26,55 +26,27 @@ def top10_movies():
     if cached is not None:
         return {"source": "cache", "data": cached}
 
-    data = models.get_top10_movies()
-    result = [dict(row) for row in data]
-    cache.set_top10_in_cache(result)
-    return {"source": "database", "data": result}
+    data = [dict(row) for row in models.get_top10_movies()]
+    cache.set_top10_in_cache(data)
+    return {"source": "database", "data": data}
 
-@movies_router.get("/{movie_id}")
-def get_movie(movie_id: str):
-    movie = models.get_movie_by_id(movie_id)
-    if not movie:
-        raise HTTPException(status_code=404, detail="Movie not found")
-    return dict(movie)
 
-# Reviews Router
-reviews_router = APIRouter(prefix="/api/reviews", tags=["Reviews"])
+def refresh_top10_cache() -> None:
+    data = [dict(row) for row in models.get_top10_movies()]
+    cache.set_top10_in_cache(data)
 
-@reviews_router.get("/movie/{movie_id}")
-def list_reviews(movie_id: str):
-    return models.get_reviews_for_movie(movie_id)
 
 @reviews_router.post("", status_code=201)
-def add_review(payload: ReviewCreate):
+def add_review(payload: ReviewCreate, background: BackgroundTasks):
     try:
         review = models.create_review(
-            payload.user_id, payload.movie_id,
-            payload.rating, payload.review_text,
+            payload.user_id,
+            payload.movie_id,
+            payload.rating,
+            payload.review_text,
         )
-        cache.invalidate_top10_cache()
-        return dict(review)
     except Exception as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
-# Users Router
-users_router = APIRouter(prefix="/api/users", tags=["Users"])
-
-@users_router.get("")
-def list_users():
-    return models.get_all_users()
-
-@users_router.get("/{user_id}")
-def get_user(user_id: str):
-    user = models.get_user_by_id(user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return dict(user)
-
-@users_router.post("", status_code=201)
-def register_user(payload: UserCreate):
-    try:
-        user = models.create_user(payload.username, payload.email, payload.password)
-        return dict(user)
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail=str(exc))
+    background.add_task(refresh_top10_cache)
+    return dict(review)
