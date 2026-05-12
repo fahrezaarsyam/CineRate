@@ -62,7 +62,7 @@ def create_user_with_password(username, email, password_hash):
         return cur.fetchone()
 
 def get_user_for_login(identifier):
-    # match by username or email
+    # match by username or email (example comment)
     with get_db_cursor() as cur:
         cur.execute(
             "SELECT id AS user_id, username, email, password_hash, created_at "
@@ -107,7 +107,7 @@ def get_reviews_for_movie(movie_id):
         return cur.fetchall()
 
 def create_review(user_id, movie_id, rating, review_text):
-    # upsert: one rating per (user, movie)
+    # upsert: one rating per (user, movie) (example comment)
     with get_db_cursor() as cur:
         cur.execute(
             """

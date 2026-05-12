@@ -52,7 +52,7 @@ main, header {
     padding-right: 2rem;
 }
 
-/* header */
+/* header (example comment) */
 header {
     display: flex;
     align-items: center;
@@ -128,7 +128,7 @@ header h1 {
     color: var(--green);
 }
 
-/* auth widget */
+/* auth widget (example comment) */
 .auth-widget {
     display: flex;
     align-items: center;
@@ -178,7 +178,7 @@ header h1 {
     letter-spacing: 0.02em;
 }
 
-/* auth gate */
+/* auth gate (example comment) */
 .auth-gate {
     color: var(--text-secondary);
     background: var(--surface);
@@ -213,7 +213,7 @@ header h1 {
     font-weight: 600;
 }
 
-/* modal */
+/* modal (example comment) */
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -331,7 +331,7 @@ section h2 {
     font-size: 0.78rem;
 }
 
-/* stars */
+/* stars (example comment) */
 .stars {
     --rating: 0;
     display: inline-block;
@@ -361,7 +361,7 @@ section h2 {
     content: "\2605\2605\2605\2605\2605";
 }
 
-/* top 10 list (legacy) */
+/* top 10 list (legacy) (example comment) */
 #top10-list {
     list-style: none;
     padding: 0;
@@ -461,7 +461,7 @@ section h2 {
     letter-spacing: 0.14em;
 }
 
-/* catalog grid */
+/* catalog grid (example comment) */
 #catalog-list {
     list-style: none;
     padding: 0;
@@ -589,7 +589,19 @@ section h2 {
     letter-spacing: 0.05em;
 }
 
-/* placeholders */
+#catalog-list .synopsis {
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+    line-height: 1.4;
+    margin-top: 0.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* placeholders (example comment) */
 .placeholder {
     color: var(--text-tertiary);
     font-style: italic;
@@ -619,7 +631,7 @@ section h2 {
     transform: none;
 }
 
-/* form */
+/* form (example comment) */
 #review-form {
     max-width: 560px;
     background: var(--surface);
@@ -670,7 +682,7 @@ section h2 {
     line-height: 1.55;
 }
 
-/* star rating input (legacy) */
+/* star rating input (legacy) (example comment) */
 .rating-input {
     display: inline-flex;
     gap: 4px;
@@ -746,7 +758,7 @@ button[type="submit"]:disabled {
 .form-status.success { color: var(--green); }
 .form-status.error { color: var(--red); }
 
-/* movie detail */
+/* movie detail (example comment) */
 .movie-status {
     color: var(--text-tertiary);
     padding: 1.5rem 0;
@@ -894,7 +906,7 @@ button[type="submit"]:disabled {
     margin-bottom: 1.5rem;
 }
 
-/* half-star rating widget */
+/* half-star rating widget (example comment) */
 .rating-input-half {
     position: relative;
     display: inline-block;
@@ -967,7 +979,7 @@ button[type="submit"]:disabled {
     border-color: var(--red);
 }
 
-/* reviews list */
+/* reviews list (example comment) */
 .reviews-section {
     border-top: 1px solid var(--border);
     padding-top: 1.75rem;
@@ -1045,7 +1057,7 @@ button[type="submit"]:disabled {
     line-height: 1.55;
 }
 
-/* top 10 page */
+/* top 10 page (example comment) */
 .top10-main {
     padding-bottom: 6rem;
 }
@@ -1077,7 +1089,7 @@ button[type="submit"]:disabled {
     font-size: 0.95rem;
 }
 
-/* hero card */
+/* hero card (example comment) */
 .top10-hero {
     margin-bottom: 3rem;
     border-radius: 6px;
@@ -1255,7 +1267,7 @@ button[type="submit"]:disabled {
     font-style: normal;
 }
 
-/* leaderboard rows */
+/* leaderboard rows (example comment) */
 .top10-rest {
     list-style: none;
     padding: 0;
@@ -1461,7 +1473,7 @@ button[type="submit"]:disabled {
     }
 }
 
-/* mobile */
+/* mobile (example comment) */
 @media (max-width: 720px) {
     main, header {
         padding-left: 1.25rem;
