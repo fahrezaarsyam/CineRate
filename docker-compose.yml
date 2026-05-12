@@ -1,5 +1,5 @@
 services:
-  #  PostgreSQL – Primary relational datastore
+  # postgres
   postgres:
     image: postgres:16-alpine
     container_name: cinerate-postgres
@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 5
 
-  #  Redis – Caching layer (Top-10 movies, etc.)
+  # redis (top-10 cache)
   redis:
     image: redis:7-alpine
     container_name: cinerate-redis

@@ -1,19 +1,19 @@
---  CineRate – Phase 3 Database Schema & Core Data
-
--- Drop existing tables if they exist to allow clean re-initialization
+-- reset tables
+DROP TABLE IF EXISTS watchlist CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS movies CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
---  1. Users Table
+-- users
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(120) NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
---  2. Movies Table
+-- movies
 CREATE TABLE movies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(200) NOT NULL,
@@ -23,32 +23,39 @@ CREATE TABLE movies (
     poster_url TEXT NOT NULL DEFAULT ''
 );
 
---  3. Reviews Table
+-- reviews (rating in 0.5 increments from 0.5 to 5)
 CREATE TABLE reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     movie_id UUID NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
     review_text TEXT DEFAULT '',
-    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    rating NUMERIC(2,1) NOT NULL CHECK (rating >= 0.5 AND rating <= 5 AND (rating * 2)::int = (rating * 2)),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    
-    -- Ensure a user can only review a movie once
     UNIQUE (user_id, movie_id)
 );
 
--- Indexes for faster lookups on foreign keys
 CREATE INDEX idx_reviews_movie ON reviews(movie_id);
 CREATE INDEX idx_reviews_user ON reviews(user_id);
 
---  Seed Data: 5 Users
-INSERT INTO users (id, username, email) VALUES
-    ('11111111-1111-1111-1111-111111111111', 'fahreza', 'fahreza@cinerate.io'),
-    ('22222222-2222-2222-2222-222222222222', 'jarkon', 'jarkon@cinerate.io'),
-    ('33333333-3333-3333-3333-333333333333', 'brogib', 'brogib@cinerate.io'),
-    ('44444444-4444-4444-4444-444444444444', 'abed', 'abed@cinerate.io'),
-    ('55555555-5555-5555-5555-555555555555', 'gibkon', 'gibkon@cinerate.io');
+-- watchlist
+CREATE TABLE watchlist (
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    movie_id UUID NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+    added_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, movie_id)
+);
 
---  Seed Data: 12 Movies
+CREATE INDEX idx_watchlist_user ON watchlist(user_id);
+
+-- seed users (password for all is "password123", bcrypt-hashed)
+INSERT INTO users (id, username, email, password_hash) VALUES
+    ('11111111-1111-1111-1111-111111111111', 'fahreza', 'fahreza@cinerate.io', '$2b$12$i/KSFTcmgkusl8t9BzAYx.kErXHgewTf16cXatWpb0lAAS.5C9gQW'),
+    ('22222222-2222-2222-2222-222222222222', 'jarkon',  'jarkon@cinerate.io',  '$2b$12$f6pDuTYJfZnc3qnfZ33.rewM/oL1aKPPcm1/igRefFsqTVafG6w/S'),
+    ('33333333-3333-3333-3333-333333333333', 'brogib',  'brogib@cinerate.io',  '$2b$12$iSL75UuTYagFcuNrqIsz.Oce5Hraeg39yPd.rjXPhVoD8Ep6Iy2ES'),
+    ('44444444-4444-4444-4444-444444444444', 'abed',    'abed@cinerate.io',    '$2b$12$A/eF48zLEhHMgqFjdshhMub8zz6LPRKiGeHWlSu3RZmHdht9MvIOa'),
+    ('55555555-5555-5555-5555-555555555555', 'gibkon',  'gibkon@cinerate.io',  '$2b$12$dDcXphokTqCyQfOLdpnePuwwWLq0YM29BofxP76R9z5rfre4s7tje');
+
+-- seed movies
 INSERT INTO movies (id, title, synopsis, director, release_year, poster_url) VALUES
     ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Spirited Away', 'During her family''s move to the suburbs, a sullen 10-year-old girl wanders into a world ruled by gods, witches, and spirits.', 'Hayao Miyazaki', 2001, 'https://image.tmdb.org/t/p/w500/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg'),
     ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'The Godfather', 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant youngest son.', 'Francis Ford Coppola', 1972, 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg'),
@@ -63,7 +70,7 @@ INSERT INTO movies (id, title, synopsis, director, release_year, poster_url) VAL
     ('5e5e5e5e-5e5e-5e5e-5e5e-5e5e5e5e5e5e', 'Spider-Man: Into the Spider-Verse', 'Teen Miles Morales becomes Spider-Man of his reality, and must join with five spider-powered individuals from other dimensions to stop a threat for all realities.', 'Bob Persichetti', 2018, 'https://image.tmdb.org/t/p/w500/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg'),
     ('6f6f6f6f-6f6f-6f6f-6f6f-6f6f6f6f6f6f', 'Dune', 'Feature adaptation of Frank Herbert''s science fiction novel about the son of a noble family entrusted with the protection of the most valuable asset in the galaxy.', 'Denis Villeneuve', 2021, 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg');
 
---  Seed Data: Reviews (Ratings 1-5)
+-- seed reviews
 INSERT INTO reviews (user_id, movie_id, rating, review_text) VALUES
     ('11111111-1111-1111-1111-111111111111', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 5, 'An absolute masterpiece. Stunning visuals and story.'),
     ('22222222-2222-2222-2222-222222222222', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 5, 'Pure magic from start to finish.'),

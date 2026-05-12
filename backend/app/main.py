@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.models import close_db_pool, init_db_pool
-from app.routes import movies_router, reviews_router
+from app.routes import auth_router, movies_router, reviews_router, watchlist_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -33,12 +33,14 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
 app.include_router(movies_router)
 app.include_router(reviews_router)
+app.include_router(watchlist_router)
 
 
 @app.get("/", tags=["Health"])

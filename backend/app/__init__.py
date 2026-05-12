@@ -1,1 +1,0 @@
-# CineRate – Backend Application Package

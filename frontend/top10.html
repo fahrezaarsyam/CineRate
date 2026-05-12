@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CineRate</title>
+    <title>CineRate — Top 10</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -18,8 +18,8 @@
             <p class="tagline">Movie ratings &amp; reviews</p>
         </div>
         <nav class="primary-nav">
-            <a href="top10.html">Top 10</a>
-            <a href="#catalog-section" class="active">Catalog</a>
+            <a href="index.html">Home</a>
+            <a href="top10.html" class="active">Top 10</a>
             <a href="watchlist.html" data-auth-user hidden>Watchlist</a>
         </nav>
         <div class="auth-widget" id="auth-widget">
@@ -34,12 +34,16 @@
         </div>
     </header>
 
-    <main>
-        <section id="catalog-section">
-            <h2>Catalog</h2>
-            <p class="section-hint">Click a film to open its page.</p>
-            <ul id="catalog-list"></ul>
+    <main class="top10-main">
+        <section class="top10-intro">
+            <p class="top10-eyebrow">Highest rated · Most reviewed</p>
+            <h2 class="top10-title">The Top 10</h2>
+            <p class="top10-sub">The ten films CineRate users can't stop talking about.</p>
         </section>
+
+        <div id="top10-status" class="movie-status">Loading the leaderboard…</div>
+        <article id="top10-hero" class="top10-hero" hidden></article>
+        <ol id="top10-rest" class="top10-rest" hidden></ol>
     </main>
 
     <div class="modal-backdrop" id="auth-modal" hidden>
@@ -81,6 +85,6 @@
     </div>
 
     <script src="js/auth.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/top10.js"></script>
 </body>
 </html>

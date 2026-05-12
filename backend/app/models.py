@@ -42,7 +42,6 @@ def get_db_cursor():
         cur.close()
         _db_pool.putconn(conn)
 
-# User Queries
 def get_all_users():
     with get_db_cursor() as cur:
         cur.execute("SELECT id AS user_id, username, email, created_at FROM users ORDER BY created_at")
@@ -53,16 +52,25 @@ def get_user_by_id(user_id):
         cur.execute("SELECT id AS user_id, username, email, created_at FROM users WHERE id = %s", (user_id,))
         return cur.fetchone()
 
-def create_user(username, email, password):
+def create_user_with_password(username, email, password_hash):
     with get_db_cursor() as cur:
-        # Note: In a real app we would hash the password.
         cur.execute(
-            "INSERT INTO users (username, email) VALUES (%s, %s) RETURNING id AS user_id, username, email, created_at",
-            (username, email),
+            "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s) "
+            "RETURNING id AS user_id, username, email, created_at",
+            (username, email, password_hash),
         )
         return cur.fetchone()
 
-# Movie Queries
+def get_user_for_login(identifier):
+    # match by username or email
+    with get_db_cursor() as cur:
+        cur.execute(
+            "SELECT id AS user_id, username, email, password_hash, created_at "
+            "FROM users WHERE username = %s OR email = %s",
+            (identifier, identifier),
+        )
+        return cur.fetchone()
+
 def get_all_movies():
     with get_db_cursor() as cur:
         cur.execute("SELECT id AS movie_id, title, synopsis, director, release_year, poster_url FROM movies ORDER BY title")
@@ -89,7 +97,6 @@ def get_top10_movies():
         """)
         return cur.fetchall()
 
-# Review Queries
 def get_reviews_for_movie(movie_id):
     with get_db_cursor() as cur:
         cur.execute("""
@@ -100,9 +107,58 @@ def get_reviews_for_movie(movie_id):
         return cur.fetchall()
 
 def create_review(user_id, movie_id, rating, review_text):
+    # upsert: one rating per (user, movie)
     with get_db_cursor() as cur:
         cur.execute(
-            "INSERT INTO reviews (user_id, movie_id, rating, review_text) VALUES (%s, %s, %s, %s) RETURNING id AS review_id, user_id, movie_id, rating, review_text, created_at",
+            """
+            INSERT INTO reviews (user_id, movie_id, rating, review_text)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id, movie_id) DO UPDATE
+                SET rating = EXCLUDED.rating,
+                    review_text = EXCLUDED.review_text,
+                    created_at = NOW()
+            RETURNING id AS review_id, user_id, movie_id, rating, review_text, created_at
+            """,
             (user_id, movie_id, rating, review_text),
         )
         return cur.fetchone()
+
+def add_to_watchlist(user_id, movie_id):
+    with get_db_cursor() as cur:
+        cur.execute(
+            "INSERT INTO watchlist (user_id, movie_id) VALUES (%s, %s) "
+            "ON CONFLICT DO NOTHING RETURNING user_id, movie_id, added_at",
+            (user_id, movie_id),
+        )
+        return cur.fetchone()
+
+def remove_from_watchlist(user_id, movie_id):
+    with get_db_cursor() as cur:
+        cur.execute(
+            "DELETE FROM watchlist WHERE user_id = %s AND movie_id = %s",
+            (user_id, movie_id),
+        )
+        return cur.rowcount
+
+def get_user_watchlist(user_id):
+    with get_db_cursor() as cur:
+        cur.execute(
+            """
+            SELECT m.id AS movie_id, m.title, m.synopsis, m.director, m.release_year, m.poster_url,
+                   w.added_at
+            FROM watchlist w
+            JOIN movies m ON m.id = w.movie_id
+            WHERE w.user_id = %s
+            ORDER BY w.added_at DESC
+            """,
+            (user_id,),
+        )
+        return cur.fetchall()
+
+def is_in_watchlist(user_id, movie_id):
+    with get_db_cursor() as cur:
+        cur.execute(
+            "SELECT 1 FROM watchlist WHERE user_id = %s AND movie_id = %s",
+            (user_id, movie_id),
+        )
+        return cur.fetchone() is not None

@@ -6,7 +6,6 @@ import redis
 
 logger = logging.getLogger("cinerate.cache")
 
-# Redis Connection Setup
 REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6380"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
@@ -30,7 +29,6 @@ def get_redis_pool() -> redis.ConnectionPool:
 def get_redis_client() -> redis.Redis:
     return redis.Redis(connection_pool=get_redis_pool())
 
-# Cache Helpers
 def get_top10_from_cache() -> Optional[list[dict]]:
     try:
         client = get_redis_client()
