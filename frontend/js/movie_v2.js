@@ -25,6 +25,19 @@ function renderMovie(movie) {
     document.getElementById("movie-meta").textContent = `${movie.director} · ${movie.release_year}`;
     document.getElementById("movie-synopsis").textContent = movie.synopsis || "";
 
+    const genresContainer = document.getElementById("movie-genres");
+    if (genresContainer) {
+        genresContainer.innerHTML = "";
+        if (movie.genres && movie.genres.length > 0) {
+            movie.genres.forEach(g => {
+                const span = document.createElement("span");
+                span.className = "genre-pill";
+                span.textContent = g;
+                genresContainer.appendChild(span);
+            });
+        }
+    }
+
     const posterEl = document.getElementById("movie-poster");
     posterEl.innerHTML = "";
     if (movie.poster_url) {

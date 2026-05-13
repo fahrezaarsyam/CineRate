@@ -96,6 +96,11 @@ function buildHero(movie, featuredReview) {
     info.appendChild(el("p", "top10-hero-eyebrow", "Currently #1"));
     info.appendChild(el("h3", "top10-hero-title", movie.title));
     info.appendChild(el("p", "top10-hero-meta", `${movie.director} · ${movie.release_year}`));
+    if (movie.genres && movie.genres.length > 0) {
+        const genresList = el("div", "genre-list");
+        movie.genres.forEach(g => genresList.appendChild(el("span", "genre-pill", g)));
+        info.appendChild(genresList);
+    }
 
     const rating = Number(movie.avg_rating || 0);
     const count = Number(movie.review_count || 0);
@@ -127,6 +132,11 @@ function buildRow(movie, rank, featuredReview) {
     const info = el("div", "top10-row-info");
     info.appendChild(el("h3", "top10-row-title", movie.title));
     info.appendChild(el("p", "top10-row-meta", `${movie.director} · ${movie.release_year}`));
+    if (movie.genres && movie.genres.length > 0) {
+        const genresList = el("div", "genre-list");
+        movie.genres.forEach(g => genresList.appendChild(el("span", "genre-pill", g)));
+        info.appendChild(genresList);
+    }
     const quote = buildQuote(featuredReview);
     if (quote) info.appendChild(quote);
     link.appendChild(info);

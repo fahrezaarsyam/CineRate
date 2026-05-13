@@ -1731,3 +1731,23 @@ button[type="submit"]:disabled {
         grid-template-columns: 1fr;
     }
 }
+
+/* genre pills */
+.genre-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+}
+
+.genre-pill {
+    background: var(--surface-elev);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-soft);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}

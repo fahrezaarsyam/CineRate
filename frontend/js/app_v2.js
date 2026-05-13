@@ -50,6 +50,15 @@ function buildCatalogItem(movie) {
     const info = el("div", "info");
     info.appendChild(el("span", "title", movie.title));
     info.appendChild(el("span", "year", movie.release_year));
+    
+    if (movie.genres && movie.genres.length > 0) {
+        const genresList = el("div", "genre-list");
+        movie.genres.forEach(g => {
+            genresList.appendChild(el("span", "genre-pill", g));
+        });
+        info.appendChild(genresList);
+    }
+    
     link.appendChild(info);
 
     li.appendChild(link);
