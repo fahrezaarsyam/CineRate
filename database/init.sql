@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- reset tables (example comment)
 DROP TABLE IF EXISTS watchlist CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
