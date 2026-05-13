@@ -61,6 +61,16 @@ class LoginRequest(BaseModel):
     password: str = Field(..., min_length=1)
 
 
+class UpdateEmailRequest(BaseModel):
+    new_email: EmailStr
+    password: str = Field(..., min_length=1)
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=6, max_length=200)
+
+
 # ---------------------------------------------------------------------------
 # Helpers (example comment)
 # ---------------------------------------------------------------------------
@@ -143,6 +153,36 @@ def list_users():
     """Return every registered user (public fields only)."""
     rows = models.get_all_users()
     return [_public_user(row) for row in rows]
+
+
+@users_router.put("/{user_id}/email")
+def update_email(user_id: str, payload: UpdateEmailRequest):
+    user_id = _validated_uuid(user_id, "user_id")
+    user = models.get_user_with_password(user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not bcrypt.checkpw(payload.password.encode("utf-8"), user["password_hash"].encode("utf-8")):
+        raise HTTPException(status_code=401, detail="Incorrect password")
+    try:
+        updated = models.update_user_email(user_id, payload.new_email)
+    except psycopg2.errors.UniqueViolation:
+        raise HTTPException(status_code=409, detail="Email already in use")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return _public_user(updated)
+
+
+@users_router.put("/{user_id}/password")
+def change_password(user_id: str, payload: ChangePasswordRequest):
+    user_id = _validated_uuid(user_id, "user_id")
+    user = models.get_user_with_password(user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not bcrypt.checkpw(payload.current_password.encode("utf-8"), user["password_hash"].encode("utf-8")):
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+    new_hash = bcrypt.hashpw(payload.new_password.encode("utf-8"), bcrypt.gensalt(rounds=12)).decode("utf-8")
+    models.update_user_password(user_id, new_hash)
+    return {"message": "Password changed successfully"}
 
 
 # ---------------------------------------------------------------------------

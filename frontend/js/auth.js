@@ -221,7 +221,7 @@ function headerAuthWidgetMarkup() {
             <button type="button" class="auth-link auth-link-primary" data-auth-open="signup">Sign up</button>
         </div>
         <div class="auth-user" data-auth-user hidden>
-            <span class="auth-username">@<span data-auth-username></span></span>
+            <a href="account.html" class="auth-username-link"><span class="auth-username">@<span data-auth-username></span></span></a>
             <button type="button" class="auth-link" data-auth-logout>Logout</button>
         </div>
     </div>`;

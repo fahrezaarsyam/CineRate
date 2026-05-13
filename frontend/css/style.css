@@ -178,6 +178,97 @@ header h1 {
     letter-spacing: 0.02em;
 }
 
+.auth-username-link {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.15s ease;
+}
+
+.auth-username-link:hover .auth-username {
+    color: var(--green);
+}
+
+/* account page */
+.account-section {
+    max-width: 560px;
+    margin-bottom: 2.5rem;
+}
+
+.account-section h2 {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.account-greeting {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    margin: 0;
+}
+
+.account-greeting strong {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.account-info-card {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    padding: 1.5rem 1.85rem;
+}
+
+.account-info-row {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.65rem 0;
+}
+
+.account-info-row + .account-info-row {
+    border-top: 1px solid var(--border-soft);
+}
+
+.account-info-label {
+    color: var(--text-tertiary);
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    flex: 0 0 6.5rem;
+}
+
+.account-info-value {
+    color: var(--text);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.account-form-title {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin: 0 0 1.25rem 0;
+}
+
+.account-form {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    padding: 1.85rem 1.85rem 1.5rem;
+}
+
+.account-gate-section {
+    max-width: 560px;
+}
+
 /* auth gate (example comment) */
 .auth-gate {
     color: var(--text-secondary);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CineRate — Movie</title>
+    <title>CineRate — Account Settings</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -35,65 +35,76 @@
     </header>
 
     <main>
-        <p id="movie-status" class="movie-status">Loading…</p>
+        <!-- Gate for unauthenticated users -->
+        <div id="account-gate" data-auth-anon hidden>
+            <section class="account-gate-section">
+                <h2>Account Settings</h2>
+                <p class="auth-gate">
+                    <button type="button" class="auth-inline" data-auth-open="login">Log in</button>
+                    or
+                    <button type="button" class="auth-inline" data-auth-open="signup">sign up</button>
+                    to access your account settings.
+                </p>
+            </section>
+        </div>
 
-        <article id="movie-detail" class="movie-detail" hidden>
-            <div class="movie-poster" id="movie-poster"></div>
+        <!-- Account settings for authenticated users -->
+        <div id="account-settings" data-auth-user hidden>
+            <section class="account-section">
+                <h2>Account Settings</h2>
+                <p class="account-greeting">Manage your account details below, <strong data-auth-username></strong>.</p>
+            </section>
 
-            <div class="movie-info">
-                <h2 class="movie-title" id="movie-title"></h2>
-                <p class="movie-meta" id="movie-meta"></p>
-
-                <div class="movie-rating-summary">
-                    <span class="stars" id="movie-avg-stars"><span class="stars-fill"></span></span>
-                    <span class="rating-caption" id="movie-avg-caption"></span>
+            <!-- User info display -->
+            <section class="account-section account-info-card" id="account-info-card">
+                <div class="account-info-row">
+                    <span class="account-info-label">Username</span>
+                    <span class="account-info-value" id="account-username">—</span>
                 </div>
-
-                <p class="movie-synopsis" id="movie-synopsis"></p>
-
-                <div class="movie-actions">
-                    <button type="button" id="watchlist-btn" class="watchlist-btn" hidden>
-                        <span class="watchlist-label">Add to Watchlist</span>
-                    </button>
-                    <p class="auth-gate" data-auth-anon hidden>
-                        <button type="button" class="auth-inline" data-auth-open="login">Log in</button>
-                        to rate or save this movie.
-                    </p>
+                <div class="account-info-row">
+                    <span class="account-info-label">Email</span>
+                    <span class="account-info-value" id="account-email">—</span>
                 </div>
+            </section>
 
-                <section id="reviews-section" class="reviews-section">
-                    <h3>Reviews</h3>
-                    <ul id="reviews-list" class="reviews-list"></ul>
-                </section>
+            <!-- Update Email -->
+            <section class="account-section">
+                <h3 class="account-form-title">Update Email</h3>
+                <form id="update-email-form" class="account-form" novalidate>
+                    <div class="field">
+                        <label for="new-email">New email address</label>
+                        <input type="email" id="new-email" name="new_email" autocomplete="email" required>
+                    </div>
+                    <div class="field">
+                        <label for="email-confirm-password">Current password</label>
+                        <input type="password" id="email-confirm-password" name="password" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit">Update Email</button>
+                    <p id="email-status" class="form-status" role="status" aria-live="polite"></p>
+                </form>
+            </section>
 
-                <section id="rate-section" class="rate-section" data-auth-user hidden>
-                    <h3>Your rating</h3>
-                    <form id="rate-form" novalidate>
-                        <div class="field rating-field">
-                            <div class="rating-input-half" id="rating-input">
-                                <div class="rating-stars-bg" aria-hidden="true">
-                                    <span class="stars rating-stars-display"><span class="stars-fill" id="rating-stars-fill"></span></span>
-                                </div>
-                                <div class="rating-hitzones" id="rating-hitzones"></div>
-                            </div>
-                            <div class="rating-controls">
-                                <span class="rating-current" id="rating-current">No rating</span>
-                                <button type="button" class="rating-clear" id="rating-clear">Clear</button>
-                            </div>
-                            <input type="hidden" id="review-rating" name="rating">
-                        </div>
-
-                        <div class="field">
-                            <label for="review-text">Review (optional)</label>
-                            <textarea id="review-text" name="review_text" rows="4" placeholder="Optional"></textarea>
-                        </div>
-
-                        <button type="submit">Submit rating</button>
-                        <p id="rate-status" class="form-status" role="status" aria-live="polite"></p>
-                    </form>
-                </section>
-            </div>
-        </article>
+            <!-- Change Password -->
+            <section class="account-section">
+                <h3 class="account-form-title">Change Password</h3>
+                <form id="change-password-form" class="account-form" novalidate>
+                    <div class="field">
+                        <label for="current-password">Current password</label>
+                        <input type="password" id="current-password" name="current_password" autocomplete="current-password" required>
+                    </div>
+                    <div class="field">
+                        <label for="new-password">New password</label>
+                        <input type="password" id="new-password" name="new_password" minlength="6" autocomplete="new-password" required>
+                    </div>
+                    <div class="field">
+                        <label for="confirm-password">Confirm new password</label>
+                        <input type="password" id="confirm-password" name="confirm_password" autocomplete="new-password" required>
+                    </div>
+                    <button type="submit">Change Password</button>
+                    <p id="password-status" class="form-status" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+        </div>
     </main>
 
     <div class="modal-backdrop" id="auth-modal" hidden>
@@ -135,6 +146,6 @@
     </div>
 
     <script src="js/auth.js"></script>
-    <script src="js/movie_v2.js"></script>
+    <script src="js/account.js"></script>
 </body>
 </html>

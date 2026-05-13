@@ -177,3 +177,31 @@ def is_in_watchlist(user_id, movie_id):
             (user_id, movie_id),
         )
         return cur.fetchone() is not None
+
+def update_user_email(user_id, new_email):
+    with get_db_cursor() as cur:
+        cur.execute(
+            "UPDATE users SET email = %s WHERE id = %s "
+            "RETURNING id AS user_id, username, email, created_at",
+            (new_email, user_id),
+        )
+        return cur.fetchone()
+
+def update_user_password(user_id, new_password_hash):
+    with get_db_cursor() as cur:
+        cur.execute(
+            "UPDATE users SET password_hash = %s WHERE id = %s "
+            "RETURNING id AS user_id, username, email, created_at",
+            (new_password_hash, user_id),
+        )
+        return cur.fetchone()
+
+def get_user_with_password(user_id):
+    """Get user by ID including password_hash for verification."""
+    with get_db_cursor() as cur:
+        cur.execute(
+            "SELECT id AS user_id, username, email, password_hash, created_at "
+            "FROM users WHERE id = %s",
+            (user_id,),
+        )
+        return cur.fetchone()
