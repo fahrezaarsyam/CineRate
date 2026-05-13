@@ -1,0 +1,8 @@
+venv/
+.venv/
+venv_cinerate/
+__pycache__/
+*.pyc
+.env
+.git/
+.vscode/
