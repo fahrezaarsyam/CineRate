@@ -3,12 +3,17 @@ import os
 import logging
 from typing import Optional
 import redis
+from dotenv import load_dotenv
 
 logger = logging.getLogger("cinerate.cache")
+
+load_dotenv()
 
 REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6380"))
 REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
+REDIS_URL = os.getenv("REDIS_URL")
 CACHE_TTL = int(os.getenv("CACHE_TTL", "300"))
 CACHE_KEY_TOP10 = "cinerate:top10"
 
@@ -17,13 +22,21 @@ _pool: Optional[redis.ConnectionPool] = None
 def get_redis_pool() -> redis.ConnectionPool:
     global _pool
     if _pool is None:
-        _pool = redis.ConnectionPool(
-            host=REDIS_HOST,
-            port=REDIS_PORT,
-            db=REDIS_DB,
-            decode_responses=True,
-            max_connections=10,
-        )
+        if REDIS_URL:
+            _pool = redis.ConnectionPool.from_url(
+                REDIS_URL,
+                decode_responses=True,
+                max_connections=10,
+            )
+        else:
+            _pool = redis.ConnectionPool(
+                host=REDIS_HOST,
+                port=REDIS_PORT,
+                db=REDIS_DB,
+                password=REDIS_PASSWORD,
+                decode_responses=True,
+                max_connections=10,
+            )
     return _pool
 
 def get_redis_client() -> redis.Redis:
