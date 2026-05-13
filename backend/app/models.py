@@ -3,8 +3,11 @@ import logging
 from contextlib import contextmanager
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
 
 logger = logging.getLogger("cinerate.models")
+
+load_dotenv()
 
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
 DB_PORT = os.getenv("DB_PORT", "5435")
