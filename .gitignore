@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 venv/
+venv_cinerate/
 .venv/
 env/
 .env
@@ -10,10 +11,6 @@ env/
 # Node
 node_modules/
 package-lock.json
-
-# Docker
-pgdata/
-redisdata/
 
 # IDE
 .vscode/

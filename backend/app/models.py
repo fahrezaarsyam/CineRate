@@ -45,6 +45,18 @@ def get_db_cursor():
         cur.close()
         _db_pool.putconn(conn)
 
+def apply_data_fixes():
+    """Idempotent data corrections for live databases."""
+    with get_db_cursor() as cur:
+        cur.execute("""
+            UPDATE movies
+            SET synopsis = 'Two detectives, a rookie and a veteran, hunt a serial killer who uses the seven deadly sins as his motives.',
+                director = 'David Fincher',
+                release_year = 1995,
+                poster_url = 'https://m.media-amazon.com/images/M/MV5BOTUwODM5MTctZjczMi00OTk4LTg3NWUtNmVhMTAzNTNjYjcyXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_SX1000.jpg'
+            WHERE id = '3b66a78c-70af-410f-aa1b-986b5dc3ea47'
+        """)
+
 def get_all_users():
     with get_db_cursor() as cur:
         cur.execute("SELECT id AS user_id, username, email, created_at FROM users ORDER BY created_at")

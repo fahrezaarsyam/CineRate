@@ -154,6 +154,14 @@ def list_movies():
     return models.get_all_movies()
 
 
+@movies_router.get("/debug/count")
+def count_movies():
+    with models.get_db_cursor() as cur:
+        cur.execute("SELECT COUNT(*) AS count FROM movies")
+        row = cur.fetchone()
+        return {"count": row["count"]}
+
+
 @movies_router.get("/top10")
 def top10_movies():
     cached = cache.get_top10_from_cache()

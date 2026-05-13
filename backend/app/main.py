@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.models import close_db_pool, init_db_pool
+from app.models import apply_data_fixes, close_db_pool, init_db_pool
 from app.routes import auth_router, movies_router, reviews_router, users_router, watchlist_router
 
 logging.basicConfig(
@@ -18,6 +18,7 @@ logger = logging.getLogger("cinerate")
 async def lifespan(app: FastAPI):
     logger.info("Starting up CineRate API...")
     init_db_pool()
+    apply_data_fixes()
     yield
     logger.info("Shutting down CineRate API...")
     close_db_pool()
