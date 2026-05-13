@@ -46,8 +46,11 @@ def get_db_cursor():
         _db_pool.putconn(conn)
 
 def apply_data_fixes():
-    """Idempotent data corrections for live databases."""
+    """Idempotent data corrections and schema migrations for live databases."""
     with get_db_cursor() as cur:
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_username_change_at TIMESTAMP")
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_email_change_at TIMESTAMP")
+        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS last_password_change_at TIMESTAMP")
         cur.execute("""
             UPDATE movies
             SET synopsis = 'Two detectives, a rookie and a veteran, hunt a serial killer who uses the seven deadly sins as his motives.',
@@ -57,21 +60,26 @@ def apply_data_fixes():
             WHERE id = '3b66a78c-70af-410f-aa1b-986b5dc3ea47'
         """)
 
+_USER_FIELDS = (
+    "id AS user_id, username, email, created_at, "
+    "last_username_change_at, last_email_change_at, last_password_change_at"
+)
+
 def get_all_users():
     with get_db_cursor() as cur:
-        cur.execute("SELECT id AS user_id, username, email, created_at FROM users ORDER BY created_at")
+        cur.execute(f"SELECT {_USER_FIELDS} FROM users ORDER BY created_at")
         return cur.fetchall()
 
 def get_user_by_id(user_id):
     with get_db_cursor() as cur:
-        cur.execute("SELECT id AS user_id, username, email, created_at FROM users WHERE id = %s", (user_id,))
+        cur.execute(f"SELECT {_USER_FIELDS} FROM users WHERE id = %s", (user_id,))
         return cur.fetchone()
 
 def create_user_with_password(username, email, password_hash):
     with get_db_cursor() as cur:
         cur.execute(
             "INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s) "
-            "RETURNING id AS user_id, username, email, created_at",
+            f"RETURNING {_USER_FIELDS}",
             (username, email, password_hash),
         )
         return cur.fetchone()
@@ -80,7 +88,7 @@ def get_user_for_login(identifier):
     # match by username or email (example comment)
     with get_db_cursor() as cur:
         cur.execute(
-            "SELECT id AS user_id, username, email, password_hash, created_at "
+            f"SELECT {_USER_FIELDS}, password_hash "
             "FROM users WHERE username = %s OR email = %s",
             (identifier, identifier),
         )
@@ -178,11 +186,20 @@ def is_in_watchlist(user_id, movie_id):
         )
         return cur.fetchone() is not None
 
+def update_user_username(user_id, new_username):
+    with get_db_cursor() as cur:
+        cur.execute(
+            "UPDATE users SET username = %s, last_username_change_at = NOW() WHERE id = %s "
+            f"RETURNING {_USER_FIELDS}",
+            (new_username, user_id),
+        )
+        return cur.fetchone()
+
 def update_user_email(user_id, new_email):
     with get_db_cursor() as cur:
         cur.execute(
-            "UPDATE users SET email = %s WHERE id = %s "
-            "RETURNING id AS user_id, username, email, created_at",
+            "UPDATE users SET email = %s, last_email_change_at = NOW() WHERE id = %s "
+            f"RETURNING {_USER_FIELDS}",
             (new_email, user_id),
         )
         return cur.fetchone()
@@ -190,8 +207,8 @@ def update_user_email(user_id, new_email):
 def update_user_password(user_id, new_password_hash):
     with get_db_cursor() as cur:
         cur.execute(
-            "UPDATE users SET password_hash = %s WHERE id = %s "
-            "RETURNING id AS user_id, username, email, created_at",
+            "UPDATE users SET password_hash = %s, last_password_change_at = NOW() WHERE id = %s "
+            f"RETURNING {_USER_FIELDS}",
             (new_password_hash, user_id),
         )
         return cur.fetchone()
@@ -200,7 +217,7 @@ def get_user_with_password(user_id):
     """Get user by ID including password_hash for verification."""
     with get_db_cursor() as cur:
         cur.execute(
-            "SELECT id AS user_id, username, email, password_hash, created_at "
+            f"SELECT {_USER_FIELDS}, password_hash "
             "FROM users WHERE id = %s",
             (user_id,),
         )

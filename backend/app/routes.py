@@ -71,6 +71,29 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(..., min_length=6, max_length=200)
 
 
+class UpdateUsernameRequest(BaseModel):
+    new_username: str = Field(..., min_length=3, max_length=50)
+    password: str = Field(..., min_length=1)
+
+
+RATE_LIMIT_SECONDS = 24 * 60 * 60
+
+
+def _check_rate_limit(last_change_at, field_label: str) -> None:
+    """Raise 429 if last_change_at is within RATE_LIMIT_SECONDS of now."""
+    if last_change_at is None:
+        return
+    from datetime import datetime
+    elapsed = (datetime.utcnow() - last_change_at).total_seconds()
+    if elapsed < RATE_LIMIT_SECONDS:
+        retry_after = int(RATE_LIMIT_SECONDS - elapsed)
+        raise HTTPException(
+            status_code=429,
+            detail=f"You can only change your {field_label} once every 24 hours. Try again in {retry_after // 3600}h {(retry_after % 3600) // 60}m.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
+
 # ---------------------------------------------------------------------------
 # Helpers (example comment)
 # ---------------------------------------------------------------------------
@@ -80,6 +103,9 @@ def _public_user(row) -> dict:
         "user_id": str(row["user_id"]),
         "username": row["username"],
         "email": row["email"],
+        "last_username_change_at": row["last_username_change_at"].isoformat() if row.get("last_username_change_at") else None,
+        "last_email_change_at": row["last_email_change_at"].isoformat() if row.get("last_email_change_at") else None,
+        "last_password_change_at": row["last_password_change_at"].isoformat() if row.get("last_password_change_at") else None,
     }
 
 
@@ -155,6 +181,24 @@ def list_users():
     return [_public_user(row) for row in rows]
 
 
+@users_router.put("/{user_id}/username")
+def update_username(user_id: str, payload: UpdateUsernameRequest):
+    user_id = _validated_uuid(user_id, "user_id")
+    user = models.get_user_with_password(user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not bcrypt.checkpw(payload.password.encode("utf-8"), user["password_hash"].encode("utf-8")):
+        raise HTTPException(status_code=401, detail="Incorrect password")
+    _check_rate_limit(user["last_username_change_at"], "username")
+    try:
+        updated = models.update_user_username(user_id, payload.new_username)
+    except psycopg2.errors.UniqueViolation:
+        raise HTTPException(status_code=409, detail="Username already in use")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return _public_user(updated)
+
+
 @users_router.put("/{user_id}/email")
 def update_email(user_id: str, payload: UpdateEmailRequest):
     user_id = _validated_uuid(user_id, "user_id")
@@ -163,6 +207,7 @@ def update_email(user_id: str, payload: UpdateEmailRequest):
         raise HTTPException(status_code=404, detail="User not found")
     if not bcrypt.checkpw(payload.password.encode("utf-8"), user["password_hash"].encode("utf-8")):
         raise HTTPException(status_code=401, detail="Incorrect password")
+    _check_rate_limit(user["last_email_change_at"], "email")
     try:
         updated = models.update_user_email(user_id, payload.new_email)
     except psycopg2.errors.UniqueViolation:
@@ -180,9 +225,10 @@ def change_password(user_id: str, payload: ChangePasswordRequest):
         raise HTTPException(status_code=404, detail="User not found")
     if not bcrypt.checkpw(payload.current_password.encode("utf-8"), user["password_hash"].encode("utf-8")):
         raise HTTPException(status_code=401, detail="Current password is incorrect")
+    _check_rate_limit(user["last_password_change_at"], "password")
     new_hash = bcrypt.hashpw(payload.new_password.encode("utf-8"), bcrypt.gensalt(rounds=12)).decode("utf-8")
-    models.update_user_password(user_id, new_hash)
-    return {"message": "Password changed successfully"}
+    updated = models.update_user_password(user_id, new_hash)
+    return _public_user(updated)
 
 
 # ---------------------------------------------------------------------------

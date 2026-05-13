@@ -56,21 +56,55 @@ function buildCatalogItem(movie) {
     return li;
 }
 
+let _allMovies = [];
+
+function renderCatalog(movies) {
+    const list = document.getElementById("catalog-list");
+    const count = document.getElementById("catalog-search-count");
+    list.innerHTML = "";
+    if (!movies.length) {
+        showPlaceholder(list, "No films match your search.");
+    } else {
+        for (const movie of movies) list.appendChild(buildCatalogItem(movie));
+    }
+    if (count) {
+        count.textContent = `${movies.length} of ${_allMovies.length}`;
+    }
+}
+
+function filterMovies(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) return _allMovies;
+    return _allMovies.filter((m) => {
+        const title = (m.title || "").toLowerCase();
+        const director = (m.director || "").toLowerCase();
+        return title.includes(q) || director.includes(q);
+    });
+}
+
+function bindCatalogSearch() {
+    const input = document.getElementById("catalog-search-input");
+    if (!input) return;
+    input.addEventListener("input", () => {
+        renderCatalog(filterMovies(input.value));
+    });
+}
+
 async function loadCatalog() {
     const list = document.getElementById("catalog-list");
     showPlaceholder(list, "Loading…");
     try {
         const res = await fetch(`${API_BASE}/movies`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const movies = await res.json();
+        _allMovies = await res.json();
 
-        if (!movies.length) {
+        if (!_allMovies.length) {
             showPlaceholder(list, "Catalog is empty.");
             return;
         }
 
-        list.innerHTML = "";
-        for (const movie of movies) list.appendChild(buildCatalogItem(movie));
+        const input = document.getElementById("catalog-search-input");
+        renderCatalog(filterMovies(input ? input.value : ""));
     } catch (err) {
         console.error("Catalog load failed:", err);
         showPlaceholder(list, "Failed to load catalog.");
@@ -79,5 +113,6 @@ async function loadCatalog() {
 
 document.addEventListener("DOMContentLoaded", () => {
     initAuth();
+    bindCatalogSearch();
     loadCatalog();
 });

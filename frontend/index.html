@@ -28,7 +28,7 @@
                 <button type="button" class="auth-link auth-link-primary" data-auth-open="signup">Sign up</button>
             </div>
             <div class="auth-user" data-auth-user hidden>
-                <a href="account.html" class="auth-username-link"><span class="auth-username">@<span data-auth-username></span></span></a>
+                <button type="button" class="auth-username-link" data-open-settings><span class="auth-username">@<span data-auth-username></span></span></button>
                 <button type="button" class="auth-link" data-auth-logout>Logout</button>
             </div>
         </div>
@@ -38,6 +38,10 @@
         <section id="catalog-section">
             <h2>Catalog</h2>
             <p class="section-hint">Click a film to open its page.</p>
+            <div class="catalog-search">
+                <input type="search" id="catalog-search-input" placeholder="Search title or director…" autocomplete="off">
+                <span class="catalog-search-count" id="catalog-search-count"></span>
+            </div>
             <ul id="catalog-list"></ul>
         </section>
     </main>

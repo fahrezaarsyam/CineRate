@@ -12,7 +12,10 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(120) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_username_change_at TIMESTAMP,
+    last_email_change_at TIMESTAMP,
+    last_password_change_at TIMESTAMP
 );
 
 -- movies (example comment)

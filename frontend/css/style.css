@@ -179,13 +179,32 @@ header h1 {
 }
 
 .auth-username-link {
+    display: inline-flex;
+    align-items: center;
+    background: var(--surface-elev);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.4rem 0.95rem;
     text-decoration: none;
     color: inherit;
-    transition: color 0.15s ease;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+
+.auth-username-link:hover {
+    border-color: var(--green);
+    background: var(--surface);
+    transform: translateY(-1px);
 }
 
 .auth-username-link:hover .auth-username {
     color: var(--green);
+}
+
+.auth-username-link:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
 }
 
 /* account page */
@@ -379,7 +398,8 @@ header h1 {
 }
 
 .auth-form .field input[type="email"],
-.auth-form .field input[type="password"] {
+.auth-form .field input[type="password"],
+.auth-form .field input[type="text"] {
     width: 100%;
     background: var(--bg);
     color: var(--text);
@@ -392,8 +412,62 @@ header h1 {
 }
 
 .auth-form .field input[type="email"]:focus,
-.auth-form .field input[type="password"]:focus {
+.auth-form .field input[type="password"]:focus,
+.auth-form .field input[type="text"]:focus {
     border-color: var(--green);
+}
+
+/* settings modal */
+.modal-settings {
+    max-width: 480px;
+}
+
+.settings-section {
+    margin-bottom: 1.5rem;
+}
+
+.settings-section:last-of-type {
+    margin-bottom: 0;
+}
+
+.settings-current {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.settings-current-label {
+    color: var(--text-tertiary);
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+}
+
+.settings-current-value {
+    color: var(--text);
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.settings-cooldown {
+    margin-top: 0.55rem;
+    color: var(--text-tertiary);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-family: var(--mono);
+}
+
+.settings-cooldown.cooldown-active {
+    color: var(--orange);
 }
 
 main {
@@ -550,6 +624,45 @@ section h2 {
     font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.14em;
+}
+
+/* catalog search */
+.catalog-search {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0 0 1.5rem;
+}
+
+.catalog-search input[type="search"] {
+    flex: 1;
+    max-width: 420px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.65rem 0.9rem;
+    outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.catalog-search input[type="search"]::placeholder {
+    color: var(--text-tertiary);
+}
+
+.catalog-search input[type="search"]:focus {
+    border-color: var(--green);
+    background: var(--surface-elev);
+}
+
+.catalog-search-count {
+    color: var(--text-tertiary);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-family: var(--mono);
 }
 
 /* catalog grid (example comment) */
