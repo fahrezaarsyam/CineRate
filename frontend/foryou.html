@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CineRate — For You</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .foryou-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .foryou-form .field { margin-bottom: 1.5rem; }
+        .foryou-form label { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem; display: block;}
+        .foryou-form select { width: 100%; padding: 0.75rem; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 1rem; color-scheme: dark; }
+        .foryou-form select option { background-color: var(--bg); color: var(--text); }
+        .foryou-btn { width: 100%; padding: 1rem; font-size: 1.1rem; background: var(--green); color: var(--bg); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .foryou-btn:hover { background: var(--green-hover); }
+        .recommendation-list {
+            margin-top: 2rem;
+            display: grid;
+            gap: 1.5rem;
+        }
+        .recommendation-card {
+            display: flex;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s;
+        }
+        .recommendation-card:hover { transform: translateY(-3px); border-color: var(--green); }
+        .recommendation-poster { width: 100px; object-fit: cover; }
+        .recommendation-info { padding: 1rem; display: flex; flex-direction: column; justify-content: center; }
+        .recommendation-title { font-size: 1.2rem; margin: 0 0 0.5rem 0; font-weight: bold; color: var(--green); }
+        .recommendation-genres { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
+        .recommendation-synopsis { font-size: 0.9rem; margin-top: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <a href="index.html" class="brand-link">
+                <h1>CineRate</h1>
+            </a>
+            <span class="brand-dots" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </span>
+            <p class="tagline">Movie ratings &amp; reviews</p>
+        </div>
+        <nav class="primary-nav">
+            <a href="index.html">Home</a>
+            <a href="leaderboard.html">Top 10</a>
+            <a href="mywatchlist.html" data-auth-user hidden>Watchlist</a>
+            <a href="foryou.html" class="active">For You</a>
+        </nav>
+        <div class="auth-widget" id="auth-widget">
+            <div class="auth-anon" data-auth-anon>
+                <button type="button" class="auth-link" data-auth-open="login">Log in</button>
+                <button type="button" class="auth-link auth-link-primary" data-auth-open="signup">Sign up</button>
+            </div>
+            <div class="auth-user" data-auth-user hidden>
+                <button type="button" class="auth-username-link" data-open-settings><span class="auth-username">@<span data-auth-username></span></span></button>
+                <button type="button" class="auth-link" data-auth-logout>Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2 style="text-align: center; margin-top: 1rem;">For You</h2>
+            <p class="section-hint" style="text-align: center;">Answer 3 questions to get 3 personalized movie recommendations.</p>
+            <div class="foryou-container">
+                <form id="foryou-form" class="foryou-form">
+                    <div class="field">
+                        <label for="q1">1. How do you want to feel today?</label>
+                        <select id="q1" required>
+                            <option value="" disabled selected>Select a vibe...</option>
+                            <option value="Action">I want to be on the edge of my seat (Action/Thriller)</option>
+                            <option value="Comedy">I need a good laugh (Comedy)</option>
+                            <option value="Drama">I want a deep, emotional story (Drama/Romance)</option>
+                            <option value="Horror">I want to be scared out of my mind (Horror)</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="q2">2. Where should the story take place?</label>
+                        <select id="q2" required>
+                            <option value="" disabled selected>Select a setting...</option>
+                            <option value="Sci-Fi">In the distant future or space (Sci-Fi)</option>
+                            <option value="Fantasy">In a magical, imaginary world (Fantasy)</option>
+                            <option value="Crime">In the gritty criminal underworld (Crime/Mystery)</option>
+                            <option value="Adventure">Anywhere, just take me on a journey (Adventure)</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="q3">3. What kind of characters do you prefer?</label>
+                        <select id="q3" required>
+                            <option value="" disabled selected>Select a theme...</option>
+                            <option value="Biography">Real historical figures (Biography/History)</option>
+                            <option value="Family">Families or kids (Family/Animation)</option>
+                            <option value="Mystery">Detectives or investigators (Mystery)</option>
+                            <option value="Music">Musicians or artists (Music)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="foryou-btn">Get Recommendations</button>
+                </form>
+
+                <div id="recommendations-container" hidden>
+                    <h3>Your Recommendations</h3>
+                    <div class="recommendation-list" id="recommendation-list"></div>
+                    <button type="button" class="foryou-btn" id="reset-btn" style="margin-top: 1.5rem; background: var(--surface); color: var(--text); border: 1px solid var(--border);">Try Again</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-backdrop" id="auth-modal" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+            <button type="button" class="modal-close" data-auth-close aria-label="Close">&times;</button>
+            <div class="modal-tabs" id="auth-modal-title">
+                <button type="button" class="modal-tab" data-tab="login">Log in</button>
+                <button type="button" class="modal-tab" data-tab="signup">Sign up</button>
+            </div>
+            <form id="login-form" class="auth-form" data-tab-panel="login" novalidate>
+                <div class="field">
+                    <label for="login-identifier">Username or email</label>
+                    <input type="text" id="login-identifier" name="identifier" autocomplete="username" required>
+                </div>
+                <div class="field">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" name="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit">Log in</button>
+                <p class="form-status" data-status role="status" aria-live="polite"></p>
+            </form>
+            <form id="signup-form" class="auth-form" data-tab-panel="signup" novalidate hidden>
+                <div class="field">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" name="username" minlength="3" maxlength="50" autocomplete="username" required>
+                </div>
+                <div class="field">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" name="email" autocomplete="email" required>
+                </div>
+                <div class="field">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" name="password" minlength="6" autocomplete="new-password" required>
+                </div>
+                <button type="submit">Create account</button>
+                <p class="form-status" data-status role="status" aria-live="polite"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/foryou_v2.js"></script>
+</body>
+</html>
