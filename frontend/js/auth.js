@@ -16,6 +16,7 @@ function saveAuth(user) {
     } else {
         localStorage.removeItem(AUTH_STORAGE_KEY);
     }
+    // Broadcast so other widgets on the page (header, watchlist) can react to login/logout.
     window.dispatchEvent(new CustomEvent("cinerate:auth", { detail: user }));
 }
 
@@ -173,6 +174,7 @@ function initAuth() {
     initSettings();
 }
 
+// Mirrors RATE_LIMIT_SECONDS on the backend (24h between profile changes); update both together.
 const COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const COOLDOWN_FIELDS = {
     username: "last_username_change_at",
@@ -370,6 +372,9 @@ async function submitSettingsChange(field, form, payload, endpoint) {
                 ? err.detail.map((d) => d.msg).join("; ")
                 : err.detail;
             if (res.status === 429) {
+                // Server rejected on cooldown but our local timestamp is stale (e.g. user cleared
+                // storage, or another tab made the change). Reconstruct it from Retry-After so the
+                // local countdown lines up with what the backend will actually accept.
                 const retryAfter = Number(res.headers.get("Retry-After")) || 0;
                 if (retryAfter > 0) {
                     const auth = loadAuth();

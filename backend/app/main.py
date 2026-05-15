@@ -31,6 +31,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# Open CORS is fine for local dev; tighten this list before deploying anywhere public.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

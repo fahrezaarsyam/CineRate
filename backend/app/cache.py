@@ -15,7 +15,8 @@ REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 REDIS_URL = os.getenv("REDIS_URL")
 CACHE_TTL = int(os.getenv("CACHE_TTL", "300"))
-CACHE_KEY_TOP10 = "cinerate:top10"
+# Bump the version suffix whenever the cached payload shape changes so old entries are not served.
+CACHE_KEY_TOP10 = "cinerate:top10:v2"
 
 _pool: Optional[redis.ConnectionPool] = None
 

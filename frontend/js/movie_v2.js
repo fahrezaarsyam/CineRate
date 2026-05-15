@@ -111,6 +111,7 @@ function buildRatingWidget() {
     });
 
     zones.addEventListener("mouseleave", () => {
+        // Revert the hover preview back to whatever the user actually committed.
         paint(Number(hidden.value || 0));
     });
 

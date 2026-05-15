@@ -34,29 +34,6 @@ function buildStars(rating) {
     return wrap;
 }
 
-function pickFeaturedReview(reviews) {
-    if (!reviews || !reviews.length) return null;
-    const withText = reviews.filter((r) => r.review_text && r.review_text.trim().length);
-    if (!withText.length) return null;
-    // pick highest rating, break ties by recency (example comment)
-    withText.sort((a, b) => {
-        const diff = Number(b.rating) - Number(a.rating);
-        if (diff !== 0) return diff;
-        return new Date(b.created_at) - new Date(a.created_at);
-    });
-    return withText[0];
-}
-
-async function fetchReviews(movieId) {
-    try {
-        const res = await fetch(`${API_BASE}/movies/${encodeURIComponent(movieId)}/reviews`);
-        if (!res.ok) return [];
-        return await res.json();
-    } catch {
-        return [];
-    }
-}
-
 function buildQuote(review) {
     if (!review) return null;
     const fig = document.createElement("figure");
@@ -169,19 +146,14 @@ async function loadTop10() {
             return;
         }
 
-        const reviewBatches = await Promise.all(
-            movies.map((m) => fetchReviews(m.movie_id)),
-        );
-        const featured = reviewBatches.map(pickFeaturedReview);
-
         status.hidden = true;
 
-        buildHero(movies[0], featured[0]);
+        buildHero(movies[0], movies[0].featured_review);
 
         rest.innerHTML = "";
         rest.hidden = false;
         for (let i = 1; i < movies.length; i++) {
-            rest.appendChild(buildRow(movies[i], i + 1, featured[i]));
+            rest.appendChild(buildRow(movies[i], i + 1, movies[i].featured_review));
         }
     } catch (err) {
         console.error("Top 10 load failed:", err);

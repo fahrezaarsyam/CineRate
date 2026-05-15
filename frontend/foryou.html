@@ -43,94 +43,137 @@
             margin: 0;
         }
 
-        .question-block {
-            margin-bottom: 3rem;
+        .picker-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
             opacity: 0;
             animation: fadeIn 0.5s ease-out forwards;
         }
 
-        .question-block:nth-child(1) { animation-delay: 0.1s; }
-        .question-block:nth-child(2) { animation-delay: 0.2s; }
-        .question-block:nth-child(3) { animation-delay: 0.3s; }
-
-        .question-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
+        .picker-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
             color: var(--text);
+        }
+
+        .picker-counter {
+            margin: 0;
+            color: var(--text-tertiary);
+            font-size: 0.95rem;
+        }
+
+        .picker-counter span {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .genre-filter {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .question-title::before {
-            content: "";
-            display: block;
-            width: 24px;
-            height: 3px;
-            background: var(--green);
-            border-radius: 2px;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1rem;
-        }
-
-        .option-card {
-            cursor: pointer;
-            position: relative;
-        }
-
-        .option-card input[type="radio"] {
-            position: absolute;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
             opacity: 0;
-            width: 0;
-            height: 0;
+            animation: fadeIn 0.5s ease-out 0.05s forwards;
         }
 
-        .option-content {
+        .genre-pill {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-soft);
+            border-radius: 999px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .genre-pill:hover {
+            border-color: rgba(0, 224, 84, 0.4);
+            color: var(--text);
+        }
+
+        .genre-pill.active {
+            background: rgba(0, 224, 84, 0.15);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .movie-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out 0.1s forwards;
+            min-height: 200px;
+        }
+
+        .picker-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--text-tertiary);
+            padding: 2rem;
+        }
+
+        .picker-card {
+            cursor: pointer;
             background: var(--surface);
             border: 2px solid var(--border-soft);
-            border-radius: 16px;
-            padding: 1.5rem 1rem;
-            text-align: center;
+            border-radius: 12px;
+            overflow: hidden;
+            padding: 0;
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            height: 100%;
+            position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            min-height: 100px;
+            color: var(--text);
+            font: inherit;
+            text-align: left;
         }
 
-        .option-card:hover .option-content {
+        .picker-card img {
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            object-fit: cover;
+            display: block;
+        }
+
+        .picker-card-title {
+            padding: 0.6rem 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .picker-card:hover {
             transform: translateY(-4px);
             border-color: rgba(0, 224, 84, 0.3);
-            background: rgba(28, 34, 40, 0.8);
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .option-card input[type="radio"]:checked + .option-content {
+        .picker-card.selected {
             border-color: var(--green);
             background: rgba(0, 224, 84, 0.08);
-            box-shadow: 0 8px 24px rgba(0, 224, 84, 0.15);
+            box-shadow: 0 8px 24px rgba(0, 224, 84, 0.2);
             transform: translateY(-4px) scale(1.02);
         }
 
-        .option-content h4 {
-            margin: 0;
-            font-size: 1.1rem;
+        .picker-card.selected .picker-card-title {
+            color: var(--green);
             font-weight: 700;
-            color: var(--text);
         }
 
-        .option-content p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: var(--text-tertiary);
+        .glow-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            filter: none;
+            box-shadow: none;
         }
 
         .glow-btn {
@@ -304,112 +347,13 @@
             </div>
 
             <form id="foryou-form" class="foryou-form">
-                <!-- Q1 -->
-                <div class="question-block">
-                    <h3 class="question-title">1. How do you want to feel today?</h3>
-                    <div class="options-grid">
-                        <label class="option-card">
-                            <input type="radio" name="q1" value="Action">
-                            <div class="option-content">
-                                <h4>I want my heart racing</h4>
-                                <p>Action / Thriller</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q1" value="Comedy">
-                            <div class="option-content">
-                                <h4>I just want to laugh</h4>
-                                <p>Comedy</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q1" value="Drama">
-                            <div class="option-content">
-                                <h4>I want to feel something</h4>
-                                <p>Drama / Romance</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q1" value="Horror">
-                            <div class="option-content">
-                                <h4>I want to be terrified</h4>
-                                <p>Horror</p>
-                            </div>
-                        </label>
-                    </div>
+                <div class="picker-header">
+                    <h3 class="picker-title">Pick 3 movies you love</h3>
+                    <p class="picker-counter"><span id="picker-count">0</span> of 3 selected</p>
                 </div>
-                
-                <!-- Q2 -->
-                <div class="question-block">
-                    <h3 class="question-title">2. Where should the story take place?</h3>
-                    <div class="options-grid">
-                        <label class="option-card">
-                            <input type="radio" name="q2" value="Sci-Fi">
-                            <div class="option-content">
-                                <h4>Take me to the future</h4>
-                                <p>Sci-Fi / Space</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q2" value="Fantasy">
-                            <div class="option-content">
-                                <h4>A magical fantasy world</h4>
-                                <p>Fantasy</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q2" value="Crime">
-                            <div class="option-content">
-                                <h4>The gritty underworld</h4>
-                                <p>Crime / Mystery</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q2" value="Adventure">
-                            <div class="option-content">
-                                <h4>Anywhere, take me on a trip!</h4>
-                                <p>Adventure</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Q3 -->
-                <div class="question-block">
-                    <h3 class="question-title">3. What kind of characters?</h3>
-                    <div class="options-grid">
-                        <label class="option-card">
-                            <input type="radio" name="q3" value="Biography">
-                            <div class="option-content">
-                                <h4>Real people with true stories</h4>
-                                <p>Biography / History</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q3" value="Family">
-                            <div class="option-content">
-                                <h4>Just wholesome characters</h4>
-                                <p>Family / Animation</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q3" value="Mystery">
-                            <div class="option-content">
-                                <h4>Someone solving a mystery</h4>
-                                <p>Mystery</p>
-                            </div>
-                        </label>
-                        <label class="option-card">
-                            <input type="radio" name="q3" value="Music">
-                            <div class="option-content">
-                                <h4>Artists chasing their dreams</h4>
-                                <p>Music</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <button type="submit" class="glow-btn">Find My Movies</button>
+                <div class="genre-filter" id="genre-filter"></div>
+                <div class="movie-picker-grid" id="movie-picker-grid"></div>
+                <button type="submit" class="glow-btn" id="submit-btn" disabled>Find My Movies</button>
             </form>
 
             <div id="recommendations-container" hidden>
@@ -459,6 +403,6 @@
     </div>
 
     <script src="js/auth.js?v=3"></script>
-    <script src="js/foryou_v2.js?v=3"></script>
+    <script src="js/foryou_v2.js?v=5"></script>
 </body>
 </html>

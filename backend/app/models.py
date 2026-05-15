@@ -60,6 +60,8 @@ def apply_data_fixes():
             WHERE id = '3b66a78c-70af-410f-aa1b-986b5dc3ea47'
         """)
 
+# Shared column list so every endpoint that returns a user produces the same shape.
+# Never include password_hash here — it has its own deliberate fetch in get_user_with_password.
 _USER_FIELDS = (
     "id AS user_id, username, email, created_at, "
     "last_username_change_at, last_email_change_at, last_password_change_at"
@@ -85,7 +87,6 @@ def create_user_with_password(username, email, password_hash):
         return cur.fetchone()
 
 def get_user_for_login(identifier):
-    # match by username or email (example comment)
     with get_db_cursor() as cur:
         cur.execute(
             f"SELECT {_USER_FIELDS}, password_hash "
@@ -110,15 +111,66 @@ def get_movie_by_id(movie_id):
         return cur.fetchone()
 
 def get_top10_movies():
+    # Single query: top10 + one featured review per movie (highest-rated with text), via
+    # LATERAL JOIN. Doing it server-side keeps the leaderboard page from doing 10 follow-up fetches.
     with get_db_cursor() as cur:
         cur.execute("""
-            SELECT m.id AS movie_id, m.title, m.synopsis, m.director, m.release_year, m.poster_url, m.genres,
-                   COALESCE(ROUND(AVG(r.rating),1),0) AS avg_rating, COUNT(r.id) AS review_count
-            FROM movies m LEFT JOIN reviews r ON m.id = r.movie_id
-            GROUP BY m.id HAVING COUNT(r.id) > 0
-            ORDER BY avg_rating DESC, review_count DESC LIMIT 10
+            WITH top10 AS (
+                SELECT m.id, m.title, m.synopsis, m.director, m.release_year,
+                       m.poster_url, m.genres,
+                       COALESCE(ROUND(AVG(r.rating), 1), 0) AS avg_rating,
+                       COUNT(r.id) AS review_count
+                FROM movies m
+                LEFT JOIN reviews r ON m.id = r.movie_id
+                GROUP BY m.id
+                HAVING COUNT(r.id) > 0
+                ORDER BY avg_rating DESC, review_count DESC
+                LIMIT 10
+            )
+            SELECT t.id AS movie_id, t.title, t.synopsis, t.director, t.release_year,
+                   t.poster_url, t.genres, t.avg_rating, t.review_count,
+                   fr.review_text AS featured_review_text,
+                   fr.username    AS featured_review_username,
+                   fr.rating      AS featured_review_rating,
+                   fr.created_at  AS featured_review_created_at
+            FROM top10 t
+            LEFT JOIN LATERAL (
+                SELECT r.review_text, r.rating, r.created_at, u.username
+                FROM reviews r
+                JOIN users u ON r.user_id = u.id
+                WHERE r.movie_id = t.id
+                  AND r.review_text IS NOT NULL
+                  AND length(trim(r.review_text)) > 0
+                ORDER BY r.rating DESC, r.created_at DESC
+                LIMIT 1
+            ) fr ON TRUE
+            ORDER BY t.avg_rating DESC, t.review_count DESC
         """)
-        return cur.fetchall()
+        rows = cur.fetchall()
+
+        results = []
+        for row in rows:
+            featured = None
+            if row["featured_review_text"]:
+                featured = {
+                    "review_text": row["featured_review_text"],
+                    "username":    row["featured_review_username"],
+                    "rating":      row["featured_review_rating"],
+                    "created_at":  row["featured_review_created_at"],
+                }
+            results.append({
+                "movie_id":        row["movie_id"],
+                "title":           row["title"],
+                "synopsis":        row["synopsis"],
+                "director":        row["director"],
+                "release_year":    row["release_year"],
+                "poster_url":      row["poster_url"],
+                "genres":          row["genres"],
+                "avg_rating":      row["avg_rating"],
+                "review_count":    row["review_count"],
+                "featured_review": featured,
+            })
+        return results
 
 def get_reviews_for_movie(movie_id):
     with get_db_cursor() as cur:
@@ -130,7 +182,8 @@ def get_reviews_for_movie(movie_id):
         return cur.fetchall()
 
 def create_review(user_id, movie_id, rating, review_text):
-    # upsert: one rating per (user, movie) (example comment)
+    # Upsert: the (user_id, movie_id) UNIQUE constraint enforces one rating per user per movie,
+    # so resubmitting silently overwrites the previous rating.
     with get_db_cursor() as cur:
         cur.execute(
             """
