@@ -7,40 +7,264 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .foryou-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 2rem auto;
-            background: var(--surface);
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
+            background: rgba(28, 34, 40, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
-        .foryou-form .field { margin-bottom: 1.5rem; }
-        .foryou-form label { font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem; display: block;}
-        .foryou-form select { width: 100%; padding: 0.75rem; border-radius: 4px; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 1rem; color-scheme: dark; }
-        .foryou-form select option { background-color: var(--bg); color: var(--text); }
-        .foryou-btn { width: 100%; padding: 1rem; font-size: 1.1rem; background: var(--green); color: var(--bg); border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .foryou-btn:hover { background: var(--green-hover); }
+
+        .foryou-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .foryou-header h2 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #fff 0%, #00e054 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 1rem 0;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            border: none;
+            text-transform: none;
+            padding: 0;
+        }
+
+        .foryou-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .question-block {
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .question-block:nth-child(1) { animation-delay: 0.1s; }
+        .question-block:nth-child(2) { animation-delay: 0.2s; }
+        .question-block:nth-child(3) { animation-delay: 0.3s; }
+
+        .question-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .question-title::before {
+            content: "";
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: var(--green);
+            border-radius: 2px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .option-card {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .option-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .option-content {
+            background: var(--surface);
+            border: 2px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 100px;
+        }
+
+        .option-card:hover .option-content {
+            transform: translateY(-4px);
+            border-color: rgba(0, 224, 84, 0.3);
+            background: rgba(28, 34, 40, 0.8);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .option-card input[type="radio"]:checked + .option-content {
+            border-color: var(--green);
+            background: rgba(0, 224, 84, 0.08);
+            box-shadow: 0 8px 24px rgba(0, 224, 84, 0.15);
+            transform: translateY(-4px) scale(1.02);
+        }
+
+        .option-content h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .option-content p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        .glow-btn {
+            width: 100%;
+            padding: 1.2rem;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--green) 0%, #00b343 100%);
+            color: var(--bg);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 224, 84, 0.25);
+            margin-top: 1rem;
+            animation: fadeIn 0.5s ease-out 0.4s forwards;
+            opacity: 0;
+        }
+
+        .glow-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0, 224, 84, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .glow-btn:active {
+            transform: translateY(1px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Recommendations styling improvements */
         .recommendation-list {
             margin-top: 2rem;
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 1.5rem;
         }
+
         .recommendation-card {
             display: flex;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 4px;
+            background: rgba(28, 34, 40, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
             overflow: hidden;
             text-decoration: none;
             color: inherit;
-            transition: transform 0.2s;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
         }
-        .recommendation-card:hover { transform: translateY(-3px); border-color: var(--green); }
-        .recommendation-poster { width: 100px; object-fit: cover; }
-        .recommendation-info { padding: 1rem; display: flex; flex-direction: column; justify-content: center; }
-        .recommendation-title { font-size: 1.2rem; margin: 0 0 0.5rem 0; font-weight: bold; color: var(--green); }
-        .recommendation-genres { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
-        .recommendation-synopsis { font-size: 0.9rem; margin-top: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .recommendation-card:nth-child(1) { animation-delay: 0.1s; }
+        .recommendation-card:nth-child(2) { animation-delay: 0.2s; }
+        .recommendation-card:nth-child(3) { animation-delay: 0.3s; }
+
+        .recommendation-card:hover {
+            transform: translateX(8px);
+            border-color: rgba(0, 224, 84, 0.4);
+            background: rgba(40, 48, 56, 0.8);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+        }
+
+        .recommendation-poster {
+            width: 140px;
+            object-fit: cover;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .recommendation-info {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .recommendation-title {
+            font-size: 1.4rem;
+            margin: 0 0 0.5rem 0;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .recommendation-genres {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--green);
+            margin: 0 0 0.75rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .recommendation-synopsis {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        #recommendations-container h3 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: var(--text);
+            background: linear-gradient(135deg, #fff 0%, #00e054 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .reset-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 2px solid var(--border-soft);
+            animation-delay: 0.5s;
+        }
+        .reset-btn:hover {
+            border-color: var(--text);
+            color: var(--text);
+            background: rgba(255,255,255,0.05);
+            box-shadow: none;
+            filter: none;
+        }
     </style>
 </head>
 <body>
@@ -73,51 +297,127 @@
     </header>
 
     <main>
-        <section>
-            <h2 style="text-align: center; margin-top: 1rem;">For You</h2>
-            <p class="section-hint" style="text-align: center;">Answer 3 questions to get 3 personalized movie recommendations.</p>
-            <div class="foryou-container">
-                <form id="foryou-form" class="foryou-form">
-                    <div class="field">
-                        <label for="q1">1. How do you want to feel today?</label>
-                        <select id="q1" required>
-                            <option value="" disabled selected>Select a vibe...</option>
-                            <option value="Action">I want to be on the edge of my seat (Action/Thriller)</option>
-                            <option value="Comedy">I need a good laugh (Comedy)</option>
-                            <option value="Drama">I want a deep, emotional story (Drama/Romance)</option>
-                            <option value="Horror">I want to be scared out of my mind (Horror)</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="q2">2. Where should the story take place?</label>
-                        <select id="q2" required>
-                            <option value="" disabled selected>Select a setting...</option>
-                            <option value="Sci-Fi">In the distant future or space (Sci-Fi)</option>
-                            <option value="Fantasy">In a magical, imaginary world (Fantasy)</option>
-                            <option value="Crime">In the gritty criminal underworld (Crime/Mystery)</option>
-                            <option value="Adventure">Anywhere, just take me on a journey (Adventure)</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="q3">3. What kind of characters do you prefer?</label>
-                        <select id="q3" required>
-                            <option value="" disabled selected>Select a theme...</option>
-                            <option value="Biography">Real historical figures (Biography/History)</option>
-                            <option value="Family">Families or kids (Family/Animation)</option>
-                            <option value="Mystery">Detectives or investigators (Mystery)</option>
-                            <option value="Music">Musicians or artists (Music)</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="foryou-btn">Get Recommendations</button>
-                </form>
-
-                <div id="recommendations-container" hidden>
-                    <h3>Your Recommendations</h3>
-                    <div class="recommendation-list" id="recommendation-list"></div>
-                    <button type="button" class="foryou-btn" id="reset-btn" style="margin-top: 1.5rem; background: var(--surface); color: var(--text); border: 1px solid var(--border);">Try Again</button>
-                </div>
+        <div class="foryou-container">
+            <div class="foryou-header">
+                <h2>Find Your Next Obsession</h2>
+                <p>Answer 3 quick questions to get personalized movie matches curated just for you.</p>
             </div>
-        </section>
+
+            <form id="foryou-form" class="foryou-form">
+                <!-- Q1 -->
+                <div class="question-block">
+                    <h3 class="question-title">1. How do you want to feel today?</h3>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Action">
+                            <div class="option-content">
+                                <h4>I want my heart racing</h4>
+                                <p>Action / Thriller</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Comedy">
+                            <div class="option-content">
+                                <h4>I just want to laugh</h4>
+                                <p>Comedy</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Drama">
+                            <div class="option-content">
+                                <h4>I want to feel something</h4>
+                                <p>Drama / Romance</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q1" value="Horror">
+                            <div class="option-content">
+                                <h4>I want to be terrified</h4>
+                                <p>Horror</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Q2 -->
+                <div class="question-block">
+                    <h3 class="question-title">2. Where should the story take place?</h3>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="Sci-Fi">
+                            <div class="option-content">
+                                <h4>Take me to the future</h4>
+                                <p>Sci-Fi / Space</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="Fantasy">
+                            <div class="option-content">
+                                <h4>A magical fantasy world</h4>
+                                <p>Fantasy</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="Crime">
+                            <div class="option-content">
+                                <h4>The gritty underworld</h4>
+                                <p>Crime / Mystery</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q2" value="Adventure">
+                            <div class="option-content">
+                                <h4>Anywhere, take me on a trip!</h4>
+                                <p>Adventure</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="question-block">
+                    <h3 class="question-title">3. What kind of characters?</h3>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Biography">
+                            <div class="option-content">
+                                <h4>Real people with true stories</h4>
+                                <p>Biography / History</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Family">
+                            <div class="option-content">
+                                <h4>Just wholesome characters</h4>
+                                <p>Family / Animation</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Mystery">
+                            <div class="option-content">
+                                <h4>Someone solving a mystery</h4>
+                                <p>Mystery</p>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="q3" value="Music">
+                            <div class="option-content">
+                                <h4>Artists chasing their dreams</h4>
+                                <p>Music</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="glow-btn">Find My Movies</button>
+            </form>
+
+            <div id="recommendations-container" hidden>
+                <h3>Your Magic Matches</h3>
+                <div class="recommendation-list" id="recommendation-list"></div>
+                <button type="button" class="glow-btn reset-btn" id="reset-btn">Start Over</button>
+            </div>
+        </div>
     </main>
 
     <div class="modal-backdrop" id="auth-modal" hidden>
@@ -158,7 +458,7 @@
         </div>
     </div>
 
-    <script src="js/auth.js"></script>
-    <script src="js/foryou_v2.js"></script>
+    <script src="js/auth.js?v=3"></script>
+    <script src="js/foryou_v2.js?v=3"></script>
 </body>
 </html>
