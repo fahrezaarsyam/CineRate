@@ -25,7 +25,7 @@ A modern movie rating and review application built with **React (Vite)** and **F
 1. Push this repository to GitHub.
 2. Link the repository to **Railway**.
 3. Railway will automatically detect the `backend` directory and deploy the FastAPI server.
-4. The API will be available at: `https://cinerate-production-20a4.up.railway.app`
+4. The API will be available at your Railway generated domain (e.g., `https://your-project.up.railway.app`)
 
 ### Frontend (Vercel)
 1. Import the project into **Vercel**.
