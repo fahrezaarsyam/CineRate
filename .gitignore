@@ -1,22 +1,36 @@
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
 venv/
 venv_cinerate/
 .venv/
 env/
-.env
+.pytest_cache/
 
-# Node
+# Sensitive Files (SECURITY)
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# Node / Frontend
 node_modules/
 package-lock.json
+frontend/dist/
+frontend/node_modules/
+.eslintcache
 
 # IDE
 .vscode/
 .idea/
 *.swp
+*.swo
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Docker
+.docker/

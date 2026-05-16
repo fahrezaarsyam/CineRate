@@ -63,7 +63,7 @@ class UpdateUsernameRequest(BaseModel):
     password: str = Field(..., min_length=1)
 
 
-# 24h cooldown between username/email/password changes — keep in sync with COOLDOWN_MS in auth.js.
+# 24h cooldown between username/email/password changes.
 RATE_LIMIT_SECONDS = 24 * 60 * 60
 
 
@@ -117,11 +117,11 @@ def _debounced_refresh_top10_cache() -> None:
     cache.set_top10_in_cache(data)
 
 
-movies_router = APIRouter(prefix="/api/movies", tags=["Movies"])
-reviews_router = APIRouter(prefix="/api/reviews", tags=["Reviews"])
-auth_router = APIRouter(prefix="/api/auth", tags=["Auth"])
-watchlist_router = APIRouter(prefix="/api/users", tags=["Watchlist"])
-users_router = APIRouter(prefix="/api/users", tags=["Users"])
+movies_router = APIRouter(prefix="/movies", tags=["Movies"])
+reviews_router = APIRouter(prefix="/reviews", tags=["Reviews"])
+auth_router = APIRouter(prefix="/auth", tags=["Auth"])
+watchlist_router = APIRouter(prefix="/users", tags=["Watchlist"])
+users_router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @auth_router.post("/signup", status_code=201)

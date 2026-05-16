@@ -1,11 +1,15 @@
-# Use an official Nginx image to serve the static files
-FROM nginx:alpine
+# Build stage
+FROM node:20-alpine as build-stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
 
-# Copy the static files to the nginx html directory
-COPY . /usr/share/nginx/html
-
-# Expose port 80
+# Production stage
+FROM nginx:stable-alpine
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+# Copy custom nginx config to handle SPA routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
