@@ -1,6 +1,8 @@
-const API_BASE = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:8000/api"
-    : "/api";
+const API_BASE = import.meta.env.VITE_API_URL || (
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://localhost:8000/api"
+        : "https://cinerate-production-20a4.up.railway.app/api"
+);
 
 async function request(path, options = {}) {
     const res = await fetch(`${API_BASE}${path}`, {

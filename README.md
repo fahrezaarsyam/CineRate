@@ -13,19 +13,25 @@ A modern movie rating and review application built with **React (Vite)** and **F
 ##  Tech Stack
 - **Frontend**: React 18, Vite, Lucide Icons, Vanilla CSS.
 - **Backend**: FastAPI (Python), PostgreSQL (Database), Redis (Caching).
-- **Deployment**: Vercel (Frontend & Backend), Railway (Database).
+- **Deployment**: Vercel (Frontend), Railway (Backend & Database).
 
 ## Project Structure
 - `/frontend`: Vite project with React components and modern CSS.
 - `/backend`: FastAPI application containing the API logic and database models.
 - `/database`: Initial SQL scripts for database setup.
 
-## Deployment (Vercel)
-This project is configured as a Vercel Monorepo using `experimentalServices`.
+## Deployment
+### Backend (Railway)
 1. Push this repository to GitHub.
-2. Import the project into Vercel.
-3. Vercel will automatically detect `vercel.json` and deploy both the frontend and backend.
-4. Ensure you add your Railway database credentials to the Vercel Environment Variables.
+2. Link the repository to **Railway**.
+3. Railway will automatically detect the `backend` directory and deploy the FastAPI server.
+4. The API will be available at: `https://cinerate-production-20a4.up.railway.app`
+
+### Frontend (Vercel)
+1. Import the project into **Vercel**.
+2. Set the **Root Directory** to `frontend`.
+3. Vercel will automatically build the Vite app.
+4. Ensure the `VITE_API_URL` environment variable is set to the Railway URL if you want to override the default.
 
 ##  Local Development (Docker)
 Run the entire stack locally with one command:
