@@ -88,7 +88,8 @@ CineRate/
 │   ├── vercel.json               # SPA rewrite rules
 │   └── Dockerfile
 ├── database/
-│   └── init.sql                  # Schema and seed data (idempotent)
+│   ├── init.sql                  # Schema and seed data (idempotent)
+│   └──dump.sql                  # Production database dump file
 ├── docs/                         # Diagrams (ERD, flowchart, UML, deployment)
 ├── docker-compose.yml            # Local dev stack
 ├── package.json                  # Monorepo install/build helper for Vercel
