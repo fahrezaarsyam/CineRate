@@ -1,11 +1,13 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- reset tablesDROP TABLE IF EXISTS watchlist CASCADE;
+-- reset tables
+DROP TABLE IF EXISTS watchlist CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS movies CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
--- usersCREATE TABLE users (
+-- users
+CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(120) NOT NULL UNIQUE,
@@ -16,7 +18,8 @@ DROP TABLE IF EXISTS users CASCADE;
     last_password_change_at TIMESTAMP
 );
 
--- moviesCREATE TABLE movies (
+-- movies
+CREATE TABLE movies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title VARCHAR(200) NOT NULL,
     synopsis TEXT NOT NULL DEFAULT '',
@@ -26,7 +29,8 @@ DROP TABLE IF EXISTS users CASCADE;
     genres VARCHAR[] NOT NULL DEFAULT '{}'
 );
 
--- reviews (rating in 0.5 increments from 0.5 to 5)CREATE TABLE reviews (
+-- reviews (rating in 0.5 increments from 0.5 to 5)
+CREATE TABLE reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     movie_id UUID NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
@@ -39,7 +43,8 @@ DROP TABLE IF EXISTS users CASCADE;
 CREATE INDEX idx_reviews_movie ON reviews(movie_id);
 CREATE INDEX idx_reviews_user ON reviews(user_id);
 
--- watchlistCREATE TABLE watchlist (
+-- watchlist
+CREATE TABLE watchlist (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     movie_id UUID NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
     added_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -48,14 +53,16 @@ CREATE INDEX idx_reviews_user ON reviews(user_id);
 
 CREATE INDEX idx_watchlist_user ON watchlist(user_id);
 
--- seed users (password for all is "password123", bcrypt-hashed)INSERT INTO users (id, username, email, password_hash) VALUES
+-- seed users (password for all is "password123", bcrypt-hashed)
+INSERT INTO users (id, username, email, password_hash) VALUES
     ('11111111-1111-1111-1111-111111111111', 'fahreza', 'fahreza@cinerate.io', '$2b$12$i/KSFTcmgkusl8t9BzAYx.kErXHgewTf16cXatWpb0lAAS.5C9gQW'),
     ('22222222-2222-2222-2222-222222222222', 'jarkon',  'jarkon@cinerate.io',  '$2b$12$f6pDuTYJfZnc3qnfZ33.rewM/oL1aKPPcm1/igRefFsqTVafG6w/S'),
     ('33333333-3333-3333-3333-333333333333', 'brogib',  'brogib@cinerate.io',  '$2b$12$iSL75UuTYagFcuNrqIsz.Oce5Hraeg39yPd.rjXPhVoD8Ep6Iy2ES'),
     ('44444444-4444-4444-4444-444444444444', 'abed',    'abed@cinerate.io',    '$2b$12$A/eF48zLEhHMgqFjdshhMub8zz6LPRKiGeHWlSu3RZmHdht9MvIOa'),
     ('55555555-5555-5555-5555-555555555555', 'gibkon',  'gibkon@cinerate.io',  '$2b$12$dDcXphokTqCyQfOLdpnePuwwWLq0YM29BofxP76R9z5rfre4s7tje');
 
--- seed moviesINSERT INTO movies (id, title, synopsis, director, release_year, poster_url, genres) VALUES
+-- seed movies
+INSERT INTO movies (id, title, synopsis, director, release_year, poster_url, genres) VALUES
     ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'The Godfather', 'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant youngest son.', 'Francis Ford Coppola', 1972, 'https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg', ARRAY['Crime', 'Drama']),
     ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'The Shawshank Redemption', 'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.', 'Frank Darabont', 1994, 'https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg', ARRAY['Drama', 'Crime']),
     ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'The Dark Knight', 'When the menace known as the Joker wreaks havoc on Gotham, Batman must accept one of the greatest psychological tests of his ability to fight injustice.', 'Christopher Nolan', 2008, 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg', ARRAY['Action', 'Crime', 'Drama']),
@@ -148,7 +155,8 @@ INSERT INTO movies (id, title, synopsis, director, release_year, poster_url, gen
     ('a1b2c3d4-0037-0000-0000-000000000037', 'Aliens', 'After floating in hypersleep for 57 years, Ellen Ripley is rescued, only to find that her terrifying account of the lethal alien creature that wiped out her crew is met with deep skepticism by corporate executives. When communication is lost with a newly established terraforming colony on the very moon where the alien was first discovered, Ripley reluctantly agrees to accompany a heavily armed squad of Colonial Marines to investigate. What begins as a rescue mission quickly escalates into a desperate, all-out war for survival against a massive hive of the horrific creatures.', 'James Cameron', 1986, 'https://upload.wikimedia.org/wikipedia/en/f/fb/Aliens_poster.jpg', ARRAY['Action', 'Adventure', 'Sci-Fi']),
     ('a1b2c3d4-0038-0000-0000-000000000038', 'American Beauty', 'A sexually frustrated suburban father has a mid-life crisis after becoming infatuated with his daughter''s best friend.', 'Sam Mendes', 1999, 'https://upload.wikimedia.org/wikipedia/en/9/9a/American_Beauty_1999_film_poster.jpg', ARRAY['Drama']),
     ('a1b2c3d4-0039-0000-0000-000000000039', 'Dr. Strangelove', 'In this brilliant and biting political satire, an unhinged and paranoid U.S. Air Force General, Jack D. Ripper, unilaterally orders a preemptive nuclear strike against the Soviet Union, believing that the communists are polluting the ''precious bodily fluids'' of the American people. As the bomber squadron nears its targets, the U.S. President, along with a frantic War Room full of politicians and military brass, including the eccentric ex-Nazi scientist Dr. Strangelove, desperately attempts to recall the planes and avert a global nuclear holocaust orchestrated by the ultimate doomsday machine.', 'Stanley Kubrick', 1964, 'https://upload.wikimedia.org/wikipedia/en/e/e6/Dr._Strangelove_poster.jpg', ARRAY['Comedy', 'War', 'Sci-Fi']);
--- seed reviewsINSERT INTO reviews (user_id, movie_id, rating, review_text) VALUES
+-- seed reviews
+INSERT INTO reviews (user_id, movie_id, rating, review_text) VALUES
     ('33333333-3333-3333-3333-333333333333', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 5, 'The definitive gangster film. Every scene is perfect.'),
     ('44444444-4444-4444-4444-444444444444', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 4, 'A bit slow at times, but undeniably great.'),
     ('55555555-5555-5555-5555-555555555555', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 5, 'A timeless story of hope.'),
